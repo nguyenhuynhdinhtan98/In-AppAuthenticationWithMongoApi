@@ -1,4 +1,10 @@
-import React, { Component, useState, useReducer, useContext } from "react";
+import React, {
+  Component,
+  useState,
+  useReducer,
+  useContext,
+  useEffect
+} from "react";
 import Space from "./Spacer";
 import { View, StyleSheet, Text } from "react-native";
 import { Button, ThemeProvider, Input } from "react-native-elements";
@@ -7,7 +13,10 @@ import { Context } from "../context/AuthorContext";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AuthForm from "../component/AuthForm";
 const SigninScreen = ({ navigation }) => {
-  const { state, signUp, signIn } = useContext(Context);
+  const { state, signUp, signIn, AutoSignIn } = useContext(Context);
+  useEffect(() => {
+    AutoSignIn();
+  }, []);
   return (
     <View style={styles.container}>
       <ThemeProvider>

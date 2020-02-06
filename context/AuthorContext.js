@@ -12,6 +12,10 @@ const action = (state, action) => {
       return { error: "", token: action.payload };
     case "signIn":
       return { error: "", token: action.payload };
+    case "signOut":
+      return { error: "", token: "" };
+    case "AutoSignin":
+      return { token: action.payload };
     default:
       return state;
   }
@@ -24,6 +28,7 @@ const signUp = dispatch => {
       dispatch({ type: "signUp", payload: output.data.token });
       navigate("TrackList");
     } catch (error) {
+      console.log(error);
       dispatch({ type: "error", error: error.message });
     }
   };
@@ -31,9 +36,8 @@ const signUp = dispatch => {
 const signIn = dispatch => {
   return async ({ email, password }) => {
     try {
-      console.log({ email, password });
       const output = await api.post("/signin", { email, password });
-      console.log(output);
+
       await AsyncStorage.setItem("token", output.data.token);
       dispatch({ type: "signUp", payload: output.data.token });
       navigate("TrackList");
@@ -43,13 +47,27 @@ const signIn = dispatch => {
     }
   };
 };
-
+const AutoSignIn = dispatch => {
+  return async () => {
+    const token = await AsyncStorage.getItem("token");
+    if (token) {
+      dispatch({ type: "AutoSignin", payload: token });
+      navigate("TrackList");
+    } else {
+      navigate("Signin");
+    }
+  };
+};
 const signOut = dispatch => {
-  return ({ email, password }) => {};
+  return async () => {
+    const token = await AsyncStorage.removeItem("token");
+    dispatch({ type: "signOut" });
+    navigate("Signin");
+  };
 };
 
 export const { Context, Provider } = createDataContext(
   action,
-  { signIn, signOut, signUp },
+  { signIn, signOut, signUp, AutoSignIn },
   { token: null, error: "" }
 );
